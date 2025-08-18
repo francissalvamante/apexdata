@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>F1 Telemetry Test</title>
+  </head>
+  <body>
+    <h1>F1 Telemetry WebSocket Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="data"></div>
+
+    <script>
+      const ws = new WebSocket("ws://localhost:3001/telemetry");
+      const statusDiv = document.getElementById("status");
+      const dataDiv = document.getElementById("data");
+
+      ws.onopen = function () {
+        statusDiv.textContent = "Connected to F1 Telemetry";
+      };
+
+      ws.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        console.log("Received:", data);
+        dataDiv.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+      };
+
+      ws.onclose = function () {
+        statusDiv.textContent = "Disconnected";
+      };
+
+      ws.onerror = function (error) {
+        statusDiv.textContent = "Error: " + error;
+      };
+    </script>
+  </body>
+</html>
