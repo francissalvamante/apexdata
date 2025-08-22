@@ -15,7 +15,7 @@ const telemetryServer = new TelemetryWebSocketServer();
 const start = async (): Promise<void> => {
   try {
     await fastify.register(cors, {
-      origin: ["http://localhost:3000"],
+      origin: ["*"],
       credentials: true,
     });
 
@@ -41,7 +41,7 @@ const start = async (): Promise<void> => {
     console.log(`🏎️  F1 Telemetry API ready`);
 
     // Auto-start telemetry UDP listener
-    await telemetryServer.startTelemetry()
+    await telemetryServer.startTelemetry();
   } catch (error) {
     fastify.log.error(error);
     process.exit(1);

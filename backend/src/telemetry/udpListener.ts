@@ -17,56 +17,43 @@ export class TelemetryUDPListener extends EventEmitter {
   private setupSocketHandlers(): void {
     // When we receive a UDP packet
     this.socket.on("message", (buffer: Buffer, rinfo) => {
-      console.log(`📦 Received UDP packet: ${buffer.length} bytes from ${rinfo.address}:${rinfo.port}`);
       try {
         // Parse the packet header first to determine packet type
         const header = this.parsePacketHeader(buffer);
-        console.log(`🔍 Packet ID: ${header.packetId}, Format: ${header.packetFormat}`);
         
         // Emit different events based on packet type
         switch (header.packetId) {
           case PacketType.CAR_TELEMETRY:
-            console.log('🏎️  Processing telemetry packet');
             this.emit("telemetry", buffer, header);
             break;
           case PacketType.LAP_DATA:
-            console.log('⏱️  Processing lap data packet');
             this.emit("lapData", buffer, header);
             break;
           case PacketType.SESSION:
-            console.log('📊 Processing session packet');
             this.emit("session", buffer, header);
             break;
           case PacketType.PARTICIPANTS:
-            console.log('👥 Processing participants packet');
             this.emit("participants", buffer, header);
             break;
           case PacketType.MOTION:
-            console.log('🌐 Processing motion packet');
             this.emit("motion", buffer, header);
             break;
           case PacketType.EVENT:
-            console.log('📣 Processing event packet');
             this.emit("event", buffer, header);
             break;
           case PacketType.CAR_SETUPS:
-            console.log('🔧 Processing car setups packet');
             this.emit("carSetups", buffer, header);
             break;
           case PacketType.CAR_STATUS:
-            console.log('📋 Processing car status packet');
             this.emit("carStatus", buffer, header);
             break;
           case PacketType.TIME_TRIAL:
-            console.log('⏰ Processing time trial packet');
             this.emit("timeTrial", buffer, header);
             break;
           case PacketType.LAP_POSITIONS:
-            console.log('🏁 Processing lap positions packet');
             this.emit("lapPositions", buffer, header);
             break;
           default:
-            console.log(`❓ Unknown packet type: ${header.packetId}`);
             this.emit("unknownPacket", buffer, header);
         }
       } catch (error) {
@@ -78,7 +65,6 @@ export class TelemetryUDPListener extends EventEmitter {
     // When socket starts listening
     this.socket.on("listening", () => {
       const address = this.socket.address();
-      console.log(`🏎️  F1 Telemetry UDP listener started on ${address.address}:${address.port}`);
       this.isListening = true;
       this.emit("listening", address);
     });
@@ -91,7 +77,6 @@ export class TelemetryUDPListener extends EventEmitter {
 
     // When socket closes
     this.socket.on("close", () => {
-      console.log("UDP socket closed");
       this.isListening = false;
       this.emit("close");
     });

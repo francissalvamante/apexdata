@@ -7,6 +7,7 @@ import {
   LapDataMessage,
   TelemetryMessage,
 } from "@/lib/telemetry-types";
+import { BACKEND_CONFIG } from "@/lib/config";
 import { useEffect, useState } from "react";
 import { useWebSocket } from "./useWebSocket";
 
@@ -21,7 +22,6 @@ interface UseTelemetryReturn {
   disconnect: () => void;
 }
 
-const WEBSOCKET_URL = "ws://localhost:3001/telemetry";
 
 export const useTelemetry = (): UseTelemetryReturn => {
   const [telemetryData, setTelemetryData] = useState<CarTelemetryData | null>(
@@ -32,14 +32,13 @@ export const useTelemetry = (): UseTelemetryReturn => {
   const [suggestedGear, setSuggestedGear] = useState<number>(0);
 
   const { connectionStatus, lastMessage, connect, disconnect } =
-    useWebSocket(WEBSOCKET_URL);
+    useWebSocket(BACKEND_CONFIG.WEBSOCKET_URL);
 
   useEffect(() => {
     if (!lastMessage) return;
 
     switch (lastMessage.type) {
       case "connected":
-        console.log("🎮 Connected to F1 Telemetry:", lastMessage.message);
         break;
       case "telemetry":
         const telemetryMsg = lastMessage as TelemetryMessage;
@@ -52,8 +51,6 @@ export const useTelemetry = (): UseTelemetryReturn => {
         setLapData(lapDataMsg.data);
         setPlayerCarIndex(lapDataMsg.playerCarIndex);
         break;
-      default:
-        console.log("📦 Unknown message type:", lastMessage);
     }
   }, [lastMessage]);
 

@@ -1,37 +1,50 @@
 # F1 Telemetry Frontend
 
-A modern React-based dashboard for visualizing real-time F1 telemetry data, built with Next.js 14 and featuring responsive design for desktop and mobile devices.
+A modern React-based dashboard for visualizing real-time F1 telemetry data, built with Next.js 15 and featuring comprehensive session analysis with interactive charts, responsive design for desktop and mobile devices.
 
 ## 🎯 Features
 
 - **Real-time Dashboard**: Live telemetry visualization with WebSocket connectivity
+- **Session Recording**: Manual session control with automatic flying lap detection
+- **Telemetry Analysis**: Comprehensive session analysis with interactive charts
+- **Session History**: Complete archive of recorded sessions with detailed visualization
 - **Responsive Design**: Optimized for desktop, tablet, and mobile viewing
-- **Interactive Charts**: Dynamic data visualization with Recharts
+- **Interactive Charts**: Dynamic data visualization with Recharts including speed, throttle/brake, temperatures
 - **Auto-reconnection**: Robust WebSocket handling with exponential backoff
 - **Route Groups**: Clean URL structure with dashboard layouts
 - **TypeScript**: Full type safety with shared backend interfaces
-- **Modern UI**: Beautiful interface with Tailwind CSS
+- **Modern UI**: Beautiful interface with TailwindCSS v4
 
 ## 📋 Project Structure
 
 ```
 frontend/
-├── app/                          # Next.js 14 App Router
+├── app/                          # Next.js 15 App Router
 │   ├── (dashboard)/             # Route group for dashboard pages
 │   │   ├── layout.tsx          # Dashboard layout with navigation
-│   │   └── live/               # Live telemetry page
-│   │       └── page.tsx        # Main telemetry dashboard
+│   │   ├── live/               # Live telemetry page
+│   │   │   └── page.tsx        # Main telemetry dashboard
+│   │   └── history/            # Session history and analysis
+│   │       ├── page.tsx        # Session history listing
+│   │       └── session/        # Individual session analysis
+│   │           └── [id]/       # Dynamic session route
+│   │               └── page.tsx # Session detail with charts
 │   ├── globals.css             # Global styles and Tailwind
 │   ├── layout.tsx              # Root layout
 │   └── page.tsx                # Home page
 ├── components/                  # Reusable React components
 │   ├── ui/                     # Base UI components
-│   └── telemetry/              # Telemetry-specific components
+│   ├── telemetry/              # Telemetry-specific components
+│   │   ├── session/            # Session management components
+│   │   └── charts/             # Chart visualization components
+│   │       └── TelemetryCharts.tsx # Comprehensive telemetry charts
 ├── hooks/                      # Custom React hooks
 │   ├── useWebSocket.ts         # WebSocket connection management
-│   └── useTelemetry.ts         # Telemetry data state management
+│   ├── useTelemetry.ts         # Telemetry data state management
+│   └── useSession.ts           # Session management and API calls
 ├── lib/                        # Utility functions
-│   └── types.ts                # Shared TypeScript definitions
+│   ├── telemetry-types.ts      # Shared TypeScript definitions
+│   └── config.ts               # Configuration and API endpoints
 ├── public/                     # Static assets
 ├── package.json
 ├── tailwind.config.js
@@ -41,11 +54,12 @@ frontend/
 
 ## 🛠️ Technology Stack
 
-- **Next.js 14** - React framework with App Router
-- **React 18** - Component-based UI library
+- **Next.js 15** - React framework with App Router
+- **React 19** - Component-based UI library
 - **TypeScript** - Type-safe JavaScript development
-- **Tailwind CSS** - Utility-first CSS framework
-- **Recharts** - Composable charting library
+- **TailwindCSS v4** - Utility-first CSS framework
+- **Recharts** - Composable charting library for telemetry visualization
+- **Supabase** - PostgreSQL database integration
 - **Lucide React** - Modern icon library
 - **clsx** - Conditional className utility
 
@@ -77,7 +91,8 @@ The development server will start on `http://localhost:3000`.
 All dashboard pages use the `(dashboard)` route group with shared layout:
 
 - **`/live`** - Real-time telemetry dashboard
-- **`/history`** - Historical data analysis (planned)
+- **`/history`** - Session history archive with search and filtering
+- **`/history/session/[id]`** - Individual session analysis with telemetry charts
 - **`/settings`** - Configuration options (planned)
 
 ### Layout Structure
@@ -166,37 +181,73 @@ The main dashboard displays real-time F1 telemetry data:
 
 #### Key Sections:
 1. **Connection Status** - WebSocket connection indicator
-2. **Player Car Metrics** - Speed, RPM, gear, DRS status
-3. **Input Controls** - Throttle, brake, steering visualization
-4. **Temperature Monitoring** - Engine and tire temperatures
-5. **Lap Information** - Current lap, sector times, position
+2. **Session Controls** - Start/stop recording with session management
+3. **Player Car Metrics** - Speed, RPM, gear, DRS status
+4. **Input Controls** - Throttle, brake, steering visualization
+5. **Temperature Monitoring** - Engine and tire temperatures
+6. **Lap Information** - Current lap, sector times, position
 
-#### Example Component:
+### Session History Page (`/history`)
+
+Archive of all recorded sessions with search and filtering:
+
+#### Features:
+1. **Session Cards** - Display session metadata, duration, lap count
+2. **Search & Filter** - Find sessions by player name, track, car
+3. **Session Statistics** - Quick overview of session performance
+4. **Navigation** - Click cards to view detailed session analysis
+
+### Session Detail Page (`/history/session/[id]`)
+
+Comprehensive telemetry analysis for individual sessions:
+
+#### Chart Components:
+1. **Speed Chart** - LineChart showing speed vs distance
+2. **Throttle Chart** - AreaChart for throttle input (0-100%)
+3. **Brake Chart** - AreaChart for brake input (0-100%)
+4. **Gear & RPM** - Combined visualization with dual Y-axes
+5. **Temperature Charts** - Engine, brake temperatures by corner
+6. **Tyre Analysis** - Surface temperatures and pressures by corner
+7. **Lap Summary** - Maximum values and key statistics
+
+#### Example Chart Component:
 
 ```typescript
-// components/telemetry/SpeedGauge.tsx
-interface SpeedGaugeProps {
-  speed: number;
-  maxSpeed?: number;
+// components/telemetry/charts/TelemetryCharts.tsx
+interface TelemetryChartsProps {
+  telemetryData: TelemetryDataPoint[];
 }
 
-export function SpeedGauge({ speed, maxSpeed = 350 }: SpeedGaugeProps) {
-  const percentage = (speed / maxSpeed) * 100;
-  
+const TelemetryCharts = ({ telemetryData }: TelemetryChartsProps) => {
+  const chartData = telemetryData.map((point) => ({
+    distance: point.distanceFromStart,
+    speed: point.speed,
+    throttle: point.throttle * 100,
+    brake: point.brake * 100,
+    // ... other telemetry fields
+  }));
+
   return (
-    <div className="gauge-container">
-      <div className="gauge-background">
-        <div 
-          className="gauge-fill"
-          style={{ width: `${percentage}%` }}
-        />
+    <div className="space-y-8">
+      {/* Speed Chart */}
+      <div className="bg-gray-800 rounded-lg p-6">
+        <h3 className="text-xl font-semibold text-white mb-4">🏁 Speed</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis dataKey="distance" stroke="#9CA3AF" />
+            <YAxis stroke="#9CA3AF" />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend />
+            <Line type="monotone" dataKey="speed" stroke="#3B82F6" strokeWidth={2} dot={false} name="Speed" />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
-      <div className="gauge-text">
-        {speed} KPH
-      </div>
+      
+      {/* Additional charts for throttle, brake, temperatures, etc. */}
     </div>
   );
-}
+};
 ```
 
 ### Responsive Design
@@ -414,7 +465,9 @@ npm run test:coverage     # Coverage report
 ## 🔮 Roadmap
 
 ### Short Term
-- [ ] Historical data visualization pages
+- [x] Historical data visualization pages ✅
+- [x] Session-based telemetry analysis ✅
+- [x] Interactive telemetry charts ✅
 - [ ] Settings page for WebSocket configuration
 - [ ] Dark mode theme toggle
 - [ ] Performance metrics dashboard
@@ -422,8 +475,9 @@ npm run test:coverage     # Coverage report
 ### Medium Term
 - [ ] Chart export functionality (PNG, SVG)
 - [ ] Telemetry data filtering and search
+- [ ] Lap comparison analysis tools
 - [ ] Real-time notifications for events
-- [ ] Comparison tools for lap data
+- [ ] Session data export (CSV, JSON)
 
 ### Long Term  
 - [ ] 3D track visualization

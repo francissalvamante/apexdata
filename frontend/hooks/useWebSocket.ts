@@ -29,7 +29,6 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
       ws.current = new WebSocket(url);
 
       ws.current.onopen = () => {
-        console.log("✅ WebSocket connected to F1 telemetry backend");
         setConnectionStatus(ConnectionStatus.CONNECTED);
         reconnectAttempts.current = 0;
       };
@@ -38,34 +37,20 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
           setLastMessage(message);
-
-          if (message.type === "telemetry") {
-            console.log(
-              `🏎️ Telemetry: ${message.data.speed} KPH, ${message.data.engineRPM} RPM, Gear ${message.data.gear}`
-            );
-          } else if (message.type === "lapData") {
-            console.log(
-              `⏱️ Lap Data: Position ${message.data.carPosition}, Lap: ${message.data.currentLapNum}`
-            );
-          }
         } catch (error) {
-          console.error("❌ Error parsing WebSocket message:", error);
+          console.error("Error parsing WebSocket message:", error);
         }
       };
 
       ws.current.onclose = (event) => {
-        console.log("🔌 WebSocket disconnected:", event.reason);
         setConnectionStatus(ConnectionStatus.DISCONNECTED);
+
+        if (event.wasClean) return; // If client disconnected intentionally, don't reconnect
 
         if (reconnectAttempts.current < maxReconnectAttempts) {
           const timeout = Math.min(
             1000 * Math.pow(2, reconnectAttempts.current),
             30000
-          );
-          console.log(
-            `🔄️ Reconnecting in ${timeout}ms... (attempt ${
-              reconnectAttempts.current + 1
-            }/${maxReconnectAttempts})`
           );
 
           reconnectTimeoutId.current = setTimeout(() => {
@@ -75,12 +60,10 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
         }
       };
 
-      ws.current.onerror = (error) => {
-        console.error("❌ WebSocket error:", error);
+      ws.current.onerror = () => {
         setConnectionStatus(ConnectionStatus.ERROR);
       };
     } catch (error) {
-      console.error("❌ Failed to create WebSocket connection:", error);
       setConnectionStatus(ConnectionStatus.ERROR);
     }
   }, [url]);
@@ -103,18 +86,8 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
   const sendMessage = useCallback((message: any) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify(message));
-    } else {
-      console.warn("⚠️ WebSocket not connected. Cannot send message");
     }
   }, []);
-
-  useEffect(() => {
-    connect();
-
-    return () => {
-      disconnect();
-    };
-  }, [connect, disconnect]);
 
   return {
     connectionStatus,

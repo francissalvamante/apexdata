@@ -11,13 +11,11 @@ export class TelemetryParser {
     buffer: Buffer,
     header: PacketHeader
   ): PacketCarTelemetryData {
-    console.log(`🔍 Parsing telemetry packet: ${buffer.length} bytes`);
-
     // Check expected size based on F1 25 specification: 1352 bytes total
     const expectedSize = 1352;
     if (buffer.length < expectedSize) {
       console.warn(
-        `⚠️  Buffer size mismatch: ${buffer.length} bytes, expected ${expectedSize} bytes`
+        `Buffer size mismatch: ${buffer.length} bytes, expected ${expectedSize} bytes`
       );
     }
 
@@ -27,12 +25,12 @@ export class TelemetryParser {
     // Parse telemetry for all 22 cars
     // CarTelemetryData size: 2+4+4+4+1+1+2+1+1+2+8+4+4+2+16+4 = 60 bytes per car
     const carTelemetryDataSize = 60;
-    
+
     for (let i = 0; i < 22; i++) {
       // Check if we have enough bytes remaining for this car
       if (offset + carTelemetryDataSize > buffer.length) {
         console.warn(
-          `⚠️  Not enough data for car ${i}: offset ${offset}, buffer length ${buffer.length}`
+          `Not enough data for car ${i}: offset ${offset}, buffer length ${buffer.length}`
         );
         break;
       }
@@ -60,9 +58,6 @@ export class TelemetryParser {
       suggestedGear = buffer.readInt8(offset);
     }
 
-    console.log(
-      `✅ Successfully parsed ${carTelemetryData.length} cars, final offset: ${offset}`
-    );
 
     return {
       header,
@@ -180,13 +175,11 @@ export class TelemetryParser {
     buffer: Buffer,
     header: PacketHeader
   ): PacketLapData {
-    console.log(`🔍 Parsing lap data packet: ${buffer.length} bytes`);
-    
     // Check expected size based on F1 25 specification: 1285 bytes total
     const expectedSize = 1285;
     if (buffer.length < expectedSize) {
       console.warn(
-        `⚠️  Buffer size mismatch: ${buffer.length} bytes, expected ${expectedSize} bytes`
+        `Buffer size mismatch: ${buffer.length} bytes, expected ${expectedSize} bytes`
       );
     }
 
@@ -199,11 +192,11 @@ export class TelemetryParser {
     for (let i = 0; i < 22; i++) {
       if (offset + lapDataSize > buffer.length) {
         console.warn(
-          `⚠️  Not enough data for lap data car ${i}: offset ${offset}, buffer length ${buffer.length}`
+          `Not enough data for lap data car ${i}: offset ${offset}, buffer length ${buffer.length}`
         );
         break;
       }
-      
+
       lapData.push(this.parseLapData(buffer, offset));
       offset += lapDataSize;
     }
@@ -224,101 +217,78 @@ export class TelemetryParser {
   private static parseLapData(buffer: Buffer, offset: number): LapData {
     const lastLapTimeInMS = buffer.readUInt32LE(offset);
     offset += 4;
-
     const currentLapTimeInMS = buffer.readUInt32LE(offset);
     offset += 4;
 
     const sector1TimeMSPart = buffer.readUInt16LE(offset);
     offset += 2;
-
     const sector1TimeMinutesPart = buffer.readUInt8(offset);
     offset += 1;
 
     const sector2TimeMSPart = buffer.readUInt16LE(offset);
     offset += 2;
-
     const sector2TimeMinutesPart = buffer.readUInt8(offset);
     offset += 1;
 
     const deltaToCarInFrontMSPart = buffer.readUInt16LE(offset);
     offset += 2;
-
     const deltaToCarInFrontMinutesPart = buffer.readUInt8(offset);
     offset += 1;
 
     const deltaToRaceLeaderMSPart = buffer.readUInt16LE(offset);
     offset += 2;
-
     const deltaToRaceLeaderMinutesPart = buffer.readUInt8(offset);
     offset += 1;
 
     const lapDistance = buffer.readFloatLE(offset);
     offset += 4;
-
     const totalDistance = buffer.readFloatLE(offset);
     offset += 4;
-
     const safetyCarDelta = buffer.readFloatLE(offset);
     offset += 4;
 
     const carPosition = buffer.readUInt8(offset);
     offset += 1;
-
     const currentLapNum = buffer.readUInt8(offset);
     offset += 1;
-
     const pitStatus = buffer.readUInt8(offset);
     offset += 1;
-
     const numPitStops = buffer.readUInt8(offset);
     offset += 1;
-
     const sector = buffer.readUInt8(offset);
     offset += 1;
-
     const currentLapInvalid = buffer.readUInt8(offset);
     offset += 1;
-
     const penalties = buffer.readUInt8(offset);
     offset += 1;
-
     const totalWarnings = buffer.readUInt8(offset);
     offset += 1;
-
     const cornerCuttingWarnings = buffer.readUInt8(offset);
     offset += 1;
-
     const numUnservedDriveThroughPens = buffer.readUInt8(offset);
     offset += 1;
-
     const numUnservedStopGoPens = buffer.readUInt8(offset);
     offset += 1;
-
     const gridPosition = buffer.readUInt8(offset);
     offset += 1;
-
     const driverStatus = buffer.readUInt8(offset);
     offset += 1;
-
     const resultStatus = buffer.readUInt8(offset);
     offset += 1;
-
     const pitLaneTimerActive = buffer.readUInt8(offset);
     offset += 1;
 
     const pitLaneTimeInLaneInMS = buffer.readUInt16LE(offset);
     offset += 2;
-
     const pitStopTimerInMS = buffer.readUInt16LE(offset);
     offset += 2;
-
     const pitStopShouldServePen = buffer.readUInt8(offset);
     offset += 1;
 
     const speedTrapFastestSpeed = buffer.readFloatLE(offset);
     offset += 4;
-
     const speedTrapFastestLap = buffer.readUInt8(offset);
+    offset += 1;
 
     return {
       lastLapTimeInMS,

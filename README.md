@@ -6,7 +6,10 @@ A comprehensive real-time telemetry application for EA Sports F1 25/24 games, fe
 
 - **Real-time Telemetry**: Captures UDP telemetry data from F1 25/24 games at 60Hz
 - **Live Dashboard**: Interactive web dashboard with real-time data visualization
+- **Session Recording**: Manual session control with automatic flying lap detection
+- **Telemetry Analysis**: Comprehensive session analysis with interactive charts and data visualization
 - **WebSocket Streaming**: Low-latency data transmission to frontend clients
+- **Database Storage**: PostgreSQL integration via Supabase for persistent telemetry data
 - **F1 25 Compliant**: Fully compatible with official EA Sports F1 25 telemetry specification
 - **Multi-car Support**: Tracks telemetry for all 22 cars simultaneously
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
@@ -90,6 +93,12 @@ apexdata/
    - Navigate to `http://localhost:3000/live`
    - Start a race or practice session in F1 game
    - Watch real-time telemetry data stream in
+   - Use session controls to record telemetry data during flying laps
+
+5. **Analyze Session Data**
+   - Navigate to `http://localhost:3000/history`
+   - View recorded sessions and click for detailed analysis
+   - Explore comprehensive telemetry charts including speed, throttle/brake, temperatures, and pressures
 
 ## 🎮 F1 Game Configuration
 
@@ -129,11 +138,12 @@ The application supports multiple F1 telemetry packet types:
 - **dgram** - UDP socket handling
 
 ### Frontend  
-- **Next.js 14** - React framework with App Router
-- **React 18** - UI library
+- **Next.js 15** - React framework with App Router
+- **React 19** - UI library
 - **TypeScript** - Type safety
-- **Tailwind CSS** - Utility-first styling
-- **Recharts** - Data visualization library
+- **TailwindCSS v4** - Utility-first styling
+- **Recharts** - Interactive data visualization library
+- **Supabase** - PostgreSQL database integration
 
 ## 🔧 Development
 
@@ -164,10 +174,12 @@ node test-udp-sender.js
 
 ## 🌟 Features in Development
 
-- [ ] Historical data storage and analysis
+- [x] Historical data storage and analysis ✅
+- [x] Session-based telemetry recording ✅
+- [x] Interactive telemetry visualizations ✅
 - [ ] User authentication and profiles
 - [ ] Data export functionality (CSV, JSON)
-- [ ] Advanced telemetry visualizations
+- [ ] Lap comparison analysis tools
 - [ ] Race strategy analysis tools
 - [ ] Multiplayer session support
 - [ ] Mobile-first responsive design enhancements

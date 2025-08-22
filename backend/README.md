@@ -6,6 +6,8 @@ A high-performance Node.js backend server that captures real-time UDP telemetry 
 
 - **UDP Telemetry Reception**: Listens for F1 25/24 telemetry packets on port 20777
 - **Real-time Parsing**: Converts binary telemetry data to structured JSON
+- **Session Management**: Records telemetry data during flying laps with automatic detection
+- **Database Storage**: PostgreSQL integration via Supabase for persistent telemetry data
 - **WebSocket Streaming**: Broadcasts telemetry to connected clients with low latency
 - **F1 25 Compliant**: Fully compatible with official EA Sports F1 25 specification
 - **Multi-packet Support**: Handles 10+ different telemetry packet types
@@ -79,7 +81,11 @@ npm run start
 ### HTTP Endpoints
 
 - `GET /` - Server health check and status
-- `GET /telemetry/status` - UDP listener status and statistics
+- `GET /api/telemetry/status` - UDP listener status and statistics
+- `POST /api/session/start` - Start recording session
+- `POST /api/session/end` - End current recording session
+- `GET /api/sessions` - Get all recorded sessions
+- `GET /api/sessions/:id` - Get detailed session data with telemetry
 
 ### WebSocket Endpoints
 
@@ -291,7 +297,9 @@ npm run test      # Run test suite (if implemented)
 
 ## 🔮 Roadmap
 
-- [ ] Database integration for historical data
+- [x] Database integration for historical data ✅
+- [x] Session-based telemetry recording ✅
+- [x] Flying lap detection and filtering ✅
 - [ ] Redis caching for session persistence  
 - [ ] Docker containerization
 - [ ] Prometheus metrics export

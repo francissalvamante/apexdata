@@ -93,3 +93,107 @@ export enum ConnectionStatus {
   CONNECTED = "connected",
   ERROR = "error",
 }
+
+/**
+ * Section: Session Types (for database/API)
+ */
+export interface Session {
+  id: string;
+  name: string;
+  playerName: string;
+  track?: string;
+  car?: string;
+  sessionType?: string;
+  createdAt: Date;
+  endedAt?: Date;
+  totalLaps: number;
+  isActive: boolean;
+  metadata?: Record<string, any>;
+}
+
+export interface Lap {
+  id: string;
+  sessionId: string;
+  lapNumber: number;
+  lapTimeMs?: number;
+  sector1TimeMs?: number;
+  sector2TimeMs?: number;
+  sector3TimeMs?: number;
+  isValid: boolean;
+  createdAt: Date;
+}
+
+export interface TelemetryDataPoint {
+  sessionId: string;
+  lapId: string;
+  distanceFromStart: number;
+  lapDistance: number;
+  speed: number;
+  throttle: number;
+  brake: number;
+  steer: number;
+  gear: number;
+  engineRpm: number;
+  drs: number;
+  engineTemp: number;
+  brakeTempRl: number;
+  brakeTempRr: number;
+  brakeTempFl: number;
+  brakeTempFr: number;
+  tyreSurfaceTempRl: number;
+  tyreSurfaceTempRr: number;
+  tyreSurfaceTempFl: number;
+  tyreSurfaceTempFr: number;
+  tyreInnerTempRl: number;
+  tyreInnerTempRr: number;
+  tyreInnerTempFl: number;
+  tyreInnerTempFr: number;
+  tyrePressureRl: number;
+  tyrePressureRr: number;
+  tyrePressureFl: number;
+  tyrePressureFr: number;
+  revLightsPercent: number;
+  clutch: number;
+  surfaceTypeRl: number;
+  surfaceTypeRr: number;
+  surfaceTypeFl: number;
+  surfaceTypeFr: number;
+}
+
+/**
+ * Section: API Response Types
+ */
+export interface ApiResponse {
+  message: string;
+  success: boolean;
+  error?: string;
+}
+
+export interface SessionsApiResponse extends ApiResponse {
+  sessions: Session[];
+}
+
+export interface SessionDetailsApiResponse extends ApiResponse {
+  session: Session;
+  laps: Lap[];
+  telemetryData: TelemetryDataPoint[];
+}
+
+export interface TelemetryStatus {
+  udp: {
+    port: number;
+    isListening: boolean;
+  };
+  connectedClients: number;
+  playerCarIndex: number;
+  session: {
+    hasActiveSession: boolean;
+    currentSessionName: string | null;
+    currentLap: number | null;
+    isInFlyingLap: boolean;
+    totalLaps: number;
+  };
+  database: {
+    isConnected: boolean;
+  };
+}
