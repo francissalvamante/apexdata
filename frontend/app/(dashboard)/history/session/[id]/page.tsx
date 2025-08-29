@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "@/hooks/useSession";
-import { TelemetryDataPoint, SessionDetailsApiResponse } from "@/lib/telemetry-types";
+import { SessionDetailsApiResponse } from "@/lib/telemetry-types";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import TelemetryCharts from "@/components/telemetry/charts/TelemetryCharts";
@@ -10,7 +10,8 @@ const SessionDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const { loadSessionDetails, loading, error } = useSession();
-  const [sessionData, setSessionData] = useState<SessionDetailsApiResponse | null>(null);
+  const [sessionData, setSessionData] =
+    useState<SessionDetailsApiResponse | null>(null);
 
   const sessionId = params.id as string;
 
@@ -25,16 +26,18 @@ const SessionDetailPage = () => {
     const totalSeconds = timeMs / 1000;
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = (totalSeconds % 60).toFixed(3);
-    return `${minutes}:${seconds.padStart(6, '0')}`;
+    return `${minutes}:${seconds.padStart(6, "0")}`;
   };
 
-  const formatDuration = (session: any) => {
+  const formatDuration = (session: { endedAt?: Date | null; createdAt: Date | string }) => {
     if (!session.endedAt) return "In Progress";
-    const duration = new Date(session.endedAt).getTime() - new Date(session.createdAt).getTime();
+    const duration =
+      (typeof session.endedAt === 'string' ? new Date(session.endedAt) : session.endedAt).getTime() -
+      (typeof session.createdAt === 'string' ? new Date(session.createdAt) : session.createdAt).getTime();
     const totalSeconds = Math.floor(duration / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
   if (loading) {
@@ -86,7 +89,9 @@ const SessionDetailPage = () => {
 
       {/* Session Info */}
       <div className="bg-gray-800 rounded-lg p-6">
-        <h2 className="text-xl font-semibold text-white mb-4">Session Information</h2>
+        <h2 className="text-xl font-semibold text-white mb-4">
+          Session Information
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <div className="text-gray-400">Player</div>
@@ -94,19 +99,27 @@ const SessionDetailPage = () => {
           </div>
           <div>
             <div className="text-gray-400">Track</div>
-            <div className="text-white font-medium">{session.track || "Unknown"}</div>
+            <div className="text-white font-medium">
+              {session.track || "Unknown"}
+            </div>
           </div>
           <div>
             <div className="text-gray-400">Car</div>
-            <div className="text-white font-medium">{session.car || "Unknown"}</div>
+            <div className="text-white font-medium">
+              {session.car || "Unknown"}
+            </div>
           </div>
           <div>
             <div className="text-gray-400">Session Type</div>
-            <div className="text-white font-medium">{session.sessionType || "Custom"}</div>
+            <div className="text-white font-medium">
+              {session.sessionType || "Custom"}
+            </div>
           </div>
           <div>
             <div className="text-gray-400">Duration</div>
-            <div className="text-white font-medium">{formatDuration(session)}</div>
+            <div className="text-white font-medium">
+              {formatDuration(session)}
+            </div>
           </div>
           <div>
             <div className="text-gray-400">Total Laps</div>
@@ -133,9 +146,14 @@ const SessionDetailPage = () => {
           <h2 className="text-xl font-semibold text-white mb-4">Lap Times</h2>
           <div className="space-y-2">
             {laps.map((lap) => (
-              <div key={lap.id} className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0">
+              <div
+                key={lap.id}
+                className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0"
+              >
                 <div className="flex items-center space-x-4">
-                  <span className="text-white font-medium">Lap {lap.lapNumber}</span>
+                  <span className="text-white font-medium">
+                    Lap {lap.lapNumber}
+                  </span>
                   {!lap.isValid && (
                     <span className="text-red-400 text-sm">INVALID</span>
                   )}
@@ -155,9 +173,12 @@ const SessionDetailPage = () => {
       ) : (
         <div className="bg-gray-800 rounded-lg p-6">
           <div className="text-center py-12">
-            <p className="text-gray-400">No telemetry data available for this session</p>
+            <p className="text-gray-400">
+              No telemetry data available for this session
+            </p>
             <p className="text-gray-500 mt-2">
-              Make sure you're recording during flying laps to capture telemetry data.
+              Make sure you&apos;re recording during flying laps to capture telemetry
+              data.
             </p>
           </div>
         </div>

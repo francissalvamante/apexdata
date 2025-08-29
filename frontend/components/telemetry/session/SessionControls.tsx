@@ -47,7 +47,7 @@ export const SessionControls = ({ className = "" }: SessionControlsProps) => {
       setCar("");
       setSessionType("practice");
       setShowStartForm(false);
-    } catch (err) {
+    } catch {
       // Error is already handled in useSession hook
     }
   };
@@ -60,7 +60,7 @@ export const SessionControls = ({ className = "" }: SessionControlsProps) => {
     ) {
       try {
         await endSession();
-      } catch (err) {
+      } catch {
         // Error is already handled in useSession hook
       }
     }

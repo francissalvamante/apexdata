@@ -108,7 +108,7 @@ export interface Session {
   endedAt?: Date;
   totalLaps: number;
   isActive: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Lap {

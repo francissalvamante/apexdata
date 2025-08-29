@@ -61,12 +61,12 @@ const TelemetryCharts = ({ telemetryData }: TelemetryChartsProps) => {
   }));
 
   // Custom tooltip component
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number | string; color: string }[]; label?: string }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-gray-800 border border-gray-600 rounded p-3 shadow-lg">
           <p className="text-white font-medium">{`Distance: ${label}m`}</p>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry, index: number) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {`${entry.name}: ${
                 typeof entry.value === "number"
