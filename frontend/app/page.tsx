@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 const HomePage = () => {
-  redirect("/live");
+  redirect("/history");
 };
 
 export default HomePage;

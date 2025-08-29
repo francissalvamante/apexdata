@@ -39,24 +39,24 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <h1 className="text-2xl font-bold">🏎️ F1 Telemetry Dashboard</h1>
             </div>
             <nav className="hidden md:flex space-x-6">
-              <a
+              {/* <a
                 href="/live"
                 className="text-gray-300 hover:text-white px-3 py-2 rounded-md font-medium transition-colors"
               >
                 📡 Live Telemetry
-              </a>
+              </a> */}
               <a
                 href="/history"
                 className="text-gray-300 hover:text-white px-3 py-2 rounded-md font-medium transition-colors"
               >
                 📊 History
               </a>
-              <a
+              {/* <a
                 href="/settings"
                 className="text-gray-300 hover:text-white px-3 py-2 rounded-md font-medium transition-colors"
               >
                 ⚙️ Settings
-              </a>
+              </a> */}
             </nav>
           </div>
         </div>
